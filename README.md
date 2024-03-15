@@ -12,6 +12,6 @@ This model is a simple PGM with three random variables: `weather`, `temperature`
 - [main.py](main.py) contains the code to build and plot the PGM using Pyro.
 
 # PGM
-The PGM figure is shown below:
+The created PGM figure is shown below:
 
 ![pgm](my_pgm.png)
