@@ -30,7 +30,7 @@ def plot_pgm():
     # Add nodes
     G.add_node("weather", name="Weather")
     G.add_node("temperature", name="Temperature")
-    G.add_node("park", name="Go To Park")
+    G.add_node("park", name="Go To Park?")
 
     # Add edges
     G.add_edge("weather", "temperature")
@@ -39,9 +39,29 @@ def plot_pgm():
 
     # Draw the graph
     pos = nx.spring_layout(G)
-    labels = {node: G.nodes[node]["name"] for node in G.nodes()}
-    nx.draw(G, pos, with_labels=False, node_color="lightblue", node_size=1000, arrowsize=12, font_size=15, font_weight="bold")
+    labels = {name: node["name"] for name, node in G.nodes().items()}
+    nx.draw(
+        G,
+        pos,
+        with_labels=False,
+        node_color="lightblue",
+        node_size=2000,
+        arrowsize=15,
+        font_size=15,
+        font_weight="bold"
+    )
     nx.draw_networkx_labels(G, pos, labels=labels)
+    nx.draw_networkx_edge_labels(
+        G,
+        pos,
+        edge_labels={
+            ("weather", "temperature"): "mean = 25 - 10 * weather",
+            ("weather", "park"): "logistic(5 - 3 * weather + (temperature - 20) / 5)",
+            ("temperature", "park"): "logistic(5 - 3 * weather + (temperature - 20) / 5)"
+        },
+        font_size=8,
+        font_color='red'
+    )
 
     # Save the graph
     plt.savefig("pgm.pdf")
@@ -49,21 +69,24 @@ def plot_pgm():
 
 if __name__ == '__main__':
     # Sampling from the model
-    predictive = Predictive(my_pgm, num_samples=1000)
+    num_samples = 1000
+    predictive = Predictive(my_pgm, num_samples=num_samples)
     samples = predictive()
 
     # Inspect the samples
     weather_samples = samples["weather"]
     temperature_samples = samples["temperature"]
     park_samples = samples["park"]
-    assert len(weather_samples) == len(temperature_samples) == len(park_samples), "Number of samples must be the same"
 
     # Print some values
     n_values = 10
-    idx = np.random.choice(len(weather_samples), n_values)
-    print(f"Weather: {weather_samples[idx]}")  # e.g. tensor([1., 0., 1., 1., 0., 1., 0., 1., 0., 1.])
-    print(f"Temperature: {temperature_samples[idx]}")  # e.g. tensor([24.9238, 25.0549, 20.1630, 15.2604, 24.7132, 13.7514, 25.5131, 16.5955, 31.1766,  9.1974])
-    print(f"Go To Park: {['Yes' if psample > 0 else 'No' for psample in park_samples[idx]]}")  # e.g. ['Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes']
+    idx = np.random.choice(num_samples, n_values)
+    # e.g. [1, 1, 1, 1, 1, 1, 0, 0, 1, 0]
+    print(f"{n_values} Weather samples: {weather_samples[idx].int().tolist()}")
+    # e.g. [13.32525634765625, 18.57118797302246, 20.02625846862793, 25.918180465698242, 15.915643692016602, 22.78240203857422, 18.47606658935547, 20.850561141967773, 0.4364767074584961, 30.41807746887207]
+    print(f"{n_values} Temperature samples: {temperature_samples[idx].tolist()}")
+    # e.g. ['Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'No', 'Yes']
+    print(f"{n_values} Go To Park samples: {['Yes' if psample > 0 else 'No' for psample in park_samples[idx]]}")
 
     # Plot and save the PGM
     plot_pgm()
