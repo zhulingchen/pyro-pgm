@@ -23,7 +23,7 @@ def my_pgm():
     return weather, temperature, park
 
 
-def plot_pgm():
+def plot_pgm(filename):
     # Create the graph
     G = nx.DiGraph()
 
@@ -64,7 +64,7 @@ def plot_pgm():
     )
 
     # Save the graph
-    plt.savefig("pgm.pdf")
+    plt.savefig(filename)
 
 
 if __name__ == '__main__':
@@ -89,4 +89,4 @@ if __name__ == '__main__':
     print(f"{n_values} Go To Park samples: {['Yes' if psample > 0 else 'No' for psample in park_samples[idx]]}")
 
     # Plot and save the PGM
-    plot_pgm()
+    plot_pgm(filename="my_pgm.png")
