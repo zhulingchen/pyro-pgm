@@ -6,7 +6,7 @@ This example demonstrates how to build a simple PGM using Pyro.
 This model is a simple PGM with three random variables: `weather`, `temperature`, and `park`. The `weather` variable is a Bernoulli distribution with a 70% chance of being sunny. The `temperature` variable is a normal distribution with a mean that depends on the `weather` variable. The `park` variable is a Bernoulli distribution that depends on both the `weather` and `temperature` variables. This is a pretty simple PGM example, but Pyro supports much more complex models and inference algorithms.
 
 # Prerequisites
-- [environment.yml](environment.yml) describes the conda environment used to run the code.
+- [environment.yaml](environment.yaml) describes the conda environment used to run the code.
 
 # Code
 - [main.py](main.py) contains the code to build and plot the PGM using Pyro.
