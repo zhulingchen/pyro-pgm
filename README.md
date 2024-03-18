@@ -1,4 +1,4 @@
-# Build a Probabilistic Graphical Model (PGM) using the [Pyro](https://pyro.ai) library
+# Build a Probabilistic Graphical Model (PGM) using the Pyro library
 [Pyro](https://pyro.ai) is a universal probabilistic programming language (PPL) written in Python and supported by [PyTorch](https://pytorch.org) on the backend. It enables flexible and expressive deep probabilistic modeling, unifying the best of modern deep learning and Bayesian modeling. Pyro is designed to be scalable and performant, to be easy to use and extend, and to be applicable for large-scale PPL applications.
 
 This example demonstrates how to build a simple PGM using Pyro.

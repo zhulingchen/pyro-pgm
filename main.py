@@ -11,9 +11,16 @@ def my_pgm():
     # Weather: 0 for sunny, 1 for rainy
     weather = pyro.sample("weather", dist.Bernoulli(0.7))  # 70% chance of sunny
 
-    # Temperature: Normal distribution, mean depends on weather
-    mean_temp = torch.tensor(25.0) + (weather * torch.tensor(-10.0))  # Cooler if rainy
-    temperature = pyro.sample("temperature", dist.Normal(mean_temp, 5.0))
+    # Mean and standard deviation of temperature are stochastic variables that depend on weather
+    # Mean temperature: Normally distributed around 25 if sunny, 15 if rainy
+    mean_temp_loc = torch.tensor(25.0) - weather * torch.tensor(10.0)
+    mean_temp = pyro.sample("mean_temp", dist.Normal(mean_temp_loc, torch.tensor(2.0)))
+    # Standard deviation of temperature: Deterministic, 5 if sunny, 2.5 if rainy
+    std_temp_v = torch.tensor(5.0) - weather * torch.tensor(2.5)
+    std_temp = pyro.sample("std_temp", dist.Delta(std_temp_v))
+
+    # Temperature: Normally distributed around mean_temp with std_temp
+    temperature = pyro.sample("temperature", dist.Normal(mean_temp, std_temp))
 
     # Park: Decision to go to the park, depends on both weather and temperature
     # We model this as a logistic regression for simplicity
@@ -81,11 +88,11 @@ if __name__ == '__main__':
     # Print some values
     n_values = 10
     idx = np.random.choice(num_samples, n_values)
-    # e.g. [1, 1, 1, 1, 1, 1, 0, 0, 1, 0]
+    # e.g. [1, 1, 0, 1, 0, 0, 1, 1, 1, 0]
     print(f"{n_values} Weather samples: {weather_samples[idx].int().tolist()}")
-    # e.g. [13.32525634765625, 18.57118797302246, 20.02625846862793, 25.918180465698242, 15.915643692016602, 22.78240203857422, 18.47606658935547, 20.850561141967773, 0.4364767074584961, 30.41807746887207]
+    # e.g. [18.10348892211914, 13.129755020141602, 21.422134399414062, 11.453704833984375, 29.757862091064453, 14.479151725769043, 16.184894561767578, 11.41153335571289, 14.973945617675781, 32.28795623779297]
     print(f"{n_values} Temperature samples: {temperature_samples[idx].tolist()}")
-    # e.g. ['Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'No', 'Yes']
+    # e.g. ['Yes', 'Yes', 'Yes', 'No', 'Yes', 'Yes', 'No', 'No', 'Yes', 'Yes']
     print(f"{n_values} Go To Park samples: {['Yes' if psample > 0 else 'No' for psample in park_samples[idx]]}")
 
     # Plot and save the PGM
