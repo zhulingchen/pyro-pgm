@@ -89,4 +89,14 @@ if __name__ == '__main__':
     print(f"{n_values} Go To Park samples: {['Yes' if psample > 0 else 'No' for psample in park_samples[idx]]}")
 
     # Plot and save the PGM
-    plot_pgm(filename="my_pgm.png")
+    # Automated method provided by Pyro using graphviz
+    pyro.render_model(
+        my_pgm,
+        filename="my_pgm.png",
+        render_distributions=True,
+        render_params=True,
+        render_deterministic=True
+    )
+
+    # Manual method
+    # plot_pgm(filename="my_pgm.png")
